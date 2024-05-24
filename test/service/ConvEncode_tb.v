@@ -50,7 +50,7 @@ module ConvEncode_tb;
         .q_sig  (q_sig),
         .en_sig (en_sig),
         .clk_sig(clk_sig),
-        .rst_sig(rst_sig),
+        .rst_n  (rst_sig),
 
         .encode_sig(encode_sig[1:0])
     );

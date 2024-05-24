@@ -6,8 +6,8 @@ M = 128; % Number of samples in 1/4 of the period
 
 % Generate the signal
 delta_x = (2 * pi / (4 * M)); % Delta x
-x = 0:delta_x:pi / 2 - delta_x; % x values
-signal = (2 ^ n) * sin(x);
+x = 0:delta_x:pi / 2; % x values
+signal = (2 ^ n - 1) * sin(x);
 
 % Quantify the signal
 quantified = fix(signal);

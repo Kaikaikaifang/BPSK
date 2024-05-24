@@ -21,18 +21,26 @@ module counter #(
     parameter NUM = 2048
 ) (
     input                            clk_sig,
-    input                            reset_sig,   // 复位信号 低电平有效
-    output reg [$clog2(NUM - 1)-1:0] counter_sig  // 计数器的值
+    input                            reset_sig,    // 复位信号 低电平有效
+    output reg [$clog2(NUM - 1)-1:0] counter_sig,  // 计数器的值
+    output reg                       carry_sig     // 进位信号
 );
     initial begin
         counter_sig = 0;
     end
 
     always @(posedge clk_sig) begin
-        if (!reset_sig || counter_sig == NUM - 1) begin
+        if (!reset_sig) begin
             counter_sig <= 0;
+            carry_sig   <= 0;
         end else begin
-            counter_sig <= counter_sig + 1'b1;
+            if (counter_sig == NUM - 1) begin
+                counter_sig <= 0;
+                carry_sig   <= 1;
+            end else begin
+                counter_sig <= counter_sig + 1'b1;
+                carry_sig   <= 0;
+            end
         end
     end
 endmodule

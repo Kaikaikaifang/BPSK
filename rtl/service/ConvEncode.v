@@ -17,14 +17,14 @@ module ConvEncode (
     input [0:0] q_sig,
     input       en_sig,
     input       clk_sig,
-    input       rst_sig,
+    input       rst_n,
 
     output [1:0] encode_sig
 );
     reg [3:0] encoder_reg;
 
     always @(posedge clk_sig) begin
-        if (rst_sig) encoder_reg <= 4'b0;
+        if (rst_n) encoder_reg <= 4'b0;
 
         if (en_sig == 1'b0) encoder_reg <= {q_sig, encoder_reg[3:1]};
     end
