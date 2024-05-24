@@ -52,8 +52,9 @@ module Carrier (
 
     always @(posedge clk_sig) begin
         if (!rst_n) begin
-            state_reg <= I_QURTER;
-            addr_sig  <= 0;
+            state_reg   <= I_QURTER;
+            addr_sig    <= 0;
+            carrier_sig <= 0;
         end else begin
             case (state_reg)
                 I_QURTER: begin

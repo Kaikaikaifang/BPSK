@@ -15,7 +15,7 @@
 // ************************************************************
 module ConvEncode (
     input [0:0] q_sig,
-    input       en_sig,
+    input       en_p,
     input       clk_sig,
     input       rst_n,
 
@@ -24,9 +24,11 @@ module ConvEncode (
     reg [3:0] encoder_reg;
 
     always @(posedge clk_sig) begin
-        if (rst_n) encoder_reg <= 4'b0;
-
-        if (en_sig == 1'b0) encoder_reg <= {q_sig, encoder_reg[3:1]};
+        if (!rst_n) begin
+            encoder_reg <= 4'b0;
+        end else begin
+            if (en_p == 1'b1) encoder_reg <= {q_sig, encoder_reg[3:1]};
+        end
     end
 
     assign encode_sig[1] = encoder_reg[3] ^ encoder_reg[1] ^ encoder_reg[0];

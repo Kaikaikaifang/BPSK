@@ -18,6 +18,8 @@
 // 1. serial_sig 的频率是 parallel_sig 的 WIDTH 倍
 // 2. ***clk_sig 的频率应当为 parallel_sig 的 2*WIDTH 倍***
 // ************************************************************
+`include "rtl/common/counter.v"
+
 module parallel2serial #(
     parameter WIDTH = 2
 ) (
@@ -30,12 +32,7 @@ module parallel2serial #(
     reg  [            0:WIDTH - 1] parallel_r;
     wire [$clog2(WIDTH - 1) - 1:0] counter_sig;
 
-    // 1. 初始化
-    initial begin
-        parallel_r <= 0;
-    end
-
-    // 2. 记数
+    // 1. 记数
     counter #(
         .NUM(WIDTH)
     ) counter_inst (
@@ -44,7 +41,7 @@ module parallel2serial #(
         .counter_sig(counter_sig)
     );
 
-    // 3. 缓存
+    // 2. 缓存
     always @(posedge clk_sig) begin
         if (!reset_sig) begin
             parallel_r <= 0;
@@ -55,6 +52,6 @@ module parallel2serial #(
         end
     end
 
-    // 4. 串行信号
+    // 3. 串行信号
     assign serial_sig = parallel_r[0];
 endmodule
