@@ -2,7 +2,7 @@
 `include "rtl/service/bpsk.v"
 `include "rtl/service/Carrier.v"
 `include "rtl/common/mseries.v"
-
+`include "rtl/service/duc.v"
 module bpsk_tb;
 
     // Parameters
@@ -17,6 +17,7 @@ module bpsk_tb;
     wire [15:0] carrier_sig;
     wire        q_sig;
     wire [15:0] bpsk_sig;
+    wire [ 1:0] base_bpsk_sig;
 
     /*iverilog */
     initial begin
@@ -52,13 +53,20 @@ module bpsk_tb;
     );
 
     bpsk u_bpsk (
-        .clk_sig    (clk_sig),
-        .rst_n      (rst_n),
-        .en_p       (rst_n),
-        .carrier_sig(carrier_sig[15:0]),
-        .base_sig   (q_sig),
+        .clk_sig (lazy_clk_sig),
+        .rst_n   (rst_n),
+        .base_sig(q_sig),
 
-        .bpsk_sig(bpsk_sig[15:0])
+        .bpsk_sig(base_bpsk_sig[1:0])
+    );
+
+    duc #(
+        .BWIDTH(2),
+        .CWIDTH(16)
+    ) u_duc (
+        .base_sig   (base_bpsk_sig[1:0]),
+        .carrier_sig(carrier_sig[15:0]),
+        .duc_sig    (bpsk_sig[15:0])
     );
 
     initial begin

@@ -5,7 +5,7 @@
 // Design Name: BPSK
 // Module Name: bpsk.v
 // Tool versions: VsCode
-// Description: BPSK 信号调制
+// Description: BPSK 基带信号调制
 // Parameter:
 // 1. 
 // Input:
@@ -14,27 +14,21 @@
 // 1. 
 // ************************************************************
 module bpsk (
-    input        clk_sig,
-    input        rst_n,
-    input        en_p,
-    input [ 0:0] base_sig,
-    input [15:0] carrier_sig,
+    input       clk_sig,
+    input       rst_n,
+    input [0:0] base_sig,
 
-    output reg [15:0] bpsk_sig
+    output reg [1:0] bpsk_sig
 );
     always @(posedge clk_sig) begin
         if (!rst_n) begin
-            bpsk_sig <= 16'b0;
+            bpsk_sig <= 2'b11;
         end else begin
-            if (en_p == 1'b1) begin
-                if (base_sig == 1'b0) begin
-                    bpsk_sig <= ~carrier_sig + 1'b1;
-                end else begin
-                    bpsk_sig <= carrier_sig;
-                end
-            end else begin
-                bpsk_sig <= 1'b0;
-            end
+            case (base_sig)
+                1'b0: bpsk_sig <= 2'b11;
+                1'b1: bpsk_sig <= 2'b01;
+                default: bpsk_sig <= 2'b11;
+            endcase
         end
     end
 endmodule
