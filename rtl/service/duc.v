@@ -24,5 +24,7 @@ module duc #(
 
     output wire [CWIDTH-1:0] duc_sig
 );
-    assign duc_sig = $signed(base_sig) * $signed(carrier_sig);
+    wire [BWIDTH + CWIDTH - 1:0] extend_duc_sig;
+    assign extend_duc_sig = $signed(base_sig) * $signed(carrier_sig);
+    assign duc_sig        = extend_duc_sig[BWIDTH+CWIDTH-1:BWIDTH];
 endmodule

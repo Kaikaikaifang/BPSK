@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 `include "rtl/service/rrc_fir.v"
-
+`include "rtl/service/Carrier.v"
+`include "rtl/service/duc.v"
 module rrc_fir_tb;
 
     // rrc_filter Parameters
@@ -9,16 +10,18 @@ module rrc_fir_tb;
     parameter OUTPUT_WIDTH = 16;
     parameter COEFF_WIDTH = 14;
     parameter NUM_TAPS = 16;
-
+    parameter CWIDTH = 16;
     // rrc_filter Inputs
-    reg                     clk_sig = 0;
-    reg                     lazy_clk_sig = 0;
-    reg                     rst_n = 0;
-    reg  [ INPUT_WIDTH-1:0] data_in = 0;
+    reg                       clk_sig = 0;
+    reg                       lazy_clk_sig = 0;
+    reg                       carrier_clk_sig = 0;
+    reg                       rst_n = 0;
+    reg  [   INPUT_WIDTH-1:0] data_in = 0;
 
     // rrc_filter Outputs
-    wire [OUTPUT_WIDTH-1:0] data_out;
-
+    wire [  OUTPUT_WIDTH-1:0] data_out;
+    wire [        CWIDTH-1:0] carrier_sig;
+    wire [OUTPUT_WIDTH - 1:0] duc_sig;
     /*iverilog */
     initial begin
         $dumpfile("simulation/vcd/rrc_fir.vcd");  //生成的vcd文件名称
@@ -27,11 +30,15 @@ module rrc_fir_tb;
     /*iverilog */
 
     always begin
-        #(PERIOD / 2) clk_sig = ~clk_sig;
+        #(PERIOD / 2) carrier_clk_sig = ~carrier_clk_sig;
     end
 
     always begin
-        #(5 * PERIOD) lazy_clk_sig = ~lazy_clk_sig;
+        #(4 * 64 * PERIOD / 2) clk_sig = ~clk_sig;
+    end
+
+    always begin
+        #(5 * 4 * 64 * PERIOD / 2) lazy_clk_sig = ~lazy_clk_sig;
     end
 
     initial begin
@@ -60,8 +67,24 @@ module rrc_fir_tb;
         .data_out(data_out[OUTPUT_WIDTH-1:0])
     );
 
+    Carrier u_Carrier (
+        .clk_sig(carrier_clk_sig),
+        .rst_n  (rst_n),
+
+        .carrier_sig(carrier_sig[15:0])
+    );
+
+    duc #(
+        .BWIDTH(OUTPUT_WIDTH),
+        .CWIDTH(CWIDTH)
+    ) u_duc (
+        .base_sig   (data_out),
+        .carrier_sig(carrier_sig),
+        .duc_sig    (duc_sig)
+    );
+
     initial begin
-        #10000 $finish;
+        #500000 $finish;
     end
 
 endmodule
