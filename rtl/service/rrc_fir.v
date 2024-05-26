@@ -1,3 +1,18 @@
+// ************************************************************
+// Engineer: kaikai
+//
+// Create Date: 2024/05/26
+// Design Name: BPSK
+// Module Name: rrc_fir.v
+// Tool versions: VsCode
+// Description: RRC FIR 滤波器
+// Parameter:
+// 1. 
+// Input:
+// 1. 
+// Output:
+// 1. 
+// ************************************************************
 module rrc_fir #(
     parameter INPUT_WIDTH = 2,
     parameter OUTPUT_WIDTH = 16,

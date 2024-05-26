@@ -18,8 +18,6 @@
 // 1. serial_sig 的频率是 parallel_sig 的 WIDTH 倍
 // 2. ***clk_sig 的频率应当为 parallel_sig 的 2*WIDTH 倍***
 // ************************************************************
-`include "rtl/common/counter.v"
-
 module parallel2serial #(
     parameter WIDTH = 2
 ) (

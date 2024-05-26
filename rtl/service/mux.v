@@ -16,10 +16,10 @@
 module mux #(
     parameter WIDTH = 16
 ) (
-    input                   sel,
-    input       [WIDTH-1:0] in_1,
-    input       [WIDTH-1:0] in_2,
-    output wire [WIDTH-1:0] out
+    input                   sel_sig,
+    input       [WIDTH-1:0] in0_sig,
+    input       [WIDTH-1:0] in1_sig,
+    output wire [WIDTH-1:0] out_sig
 );
-    assign out = sel ? in_1 : in_2;
+    assign out_sig = sel_sig ? in1_sig : in0_sig;
 endmodule

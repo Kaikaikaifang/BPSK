@@ -13,7 +13,6 @@
 // Output:
 // 1. 
 // ************************************************************
-`include "rtl/common/counter.v"
 `include "rtl/common/rom.v"
 module Carrier (
     input wire clk_sig,
