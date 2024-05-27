@@ -2,7 +2,7 @@ clc; clear;
 
 % Params
 n = 15; % Number of bits
-M = 64; % Number of samples in 1/4 of the period
+M = 2; % Number of samples in 1/4 of the period
 
 % Generate the signal
 delta_x = (2 * pi / (4 * M)); % Delta x

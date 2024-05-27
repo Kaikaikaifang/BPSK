@@ -7,25 +7,29 @@
 // Tool versions: VsCode
 // Description: 
 // Parameter:
-// 1. 
+// 1. WIDTH: 量化后的宽度
+// 2. NUM: 1/4 周期采样点数
 // Input:
 // 1. 
 // Output:
 // 1. 
 // ************************************************************
 `include "rtl/common/rom.v"
-module Carrier (
+module Carrier #(
+    parameter WIDTH = 16,
+    parameter NUM   = 2
+) (
     input wire clk_sig,
     input wire rst_n,
 
-    output reg [15:0] carrier_sig
+    output reg [WIDTH-1:0] carrier_sig
 );
-    wire [ 5:0] counter_sig;
-    wire [ 0:0] flag_sig;
-    wire [14:0] carrier_reg;
+    wire [$clog2(NUM)-1:0] counter_sig;
+    wire [            0:0] flag_sig;
+    wire [      WIDTH-2:0] carrier_reg;
 
-    reg  [ 6:0] addr_sig;
-    reg  [ 1:0] state_reg;
+    reg  [  $clog2(NUM):0] addr_sig;
+    reg  [            1:0] state_reg;
 
     localparam [1:0] I_QURTER = 0;
     localparam [1:0] II_QURTER = 1;
@@ -33,7 +37,7 @@ module Carrier (
     localparam [1:0] IV_QURTER = 3;
 
     counter #(
-        .NUM(64)
+        .NUM(NUM)
     ) counter_inst (
         .clk_sig    (clk_sig),
         .reset_sig  (rst_n),
@@ -42,8 +46,8 @@ module Carrier (
     );
 
     rom #(
-        .WIDTH(15),
-        .DEPTH(65)
+        .WIDTH(WIDTH - 1),
+        .DEPTH(NUM + 1)
     ) rom_inst (
         .addr_sig(addr_sig),
         .q_sig   (carrier_reg)
@@ -68,7 +72,7 @@ module Carrier (
                         state_reg <= III_QURTER;
                     end
                     carrier_sig <= {1'b0, carrier_reg};
-                    addr_sig    <= 7'd64 - {flag_sig, counter_sig};
+                    addr_sig    <= NUM - {flag_sig, counter_sig};
                 end
                 III_QURTER: begin
                     if (flag_sig) begin
@@ -82,7 +86,7 @@ module Carrier (
                         state_reg <= I_QURTER;
                     end
                     carrier_sig <= ~{1'b0, carrier_reg} + 1'b1;
-                    addr_sig    <= 7'd64 - {flag_sig, counter_sig};
+                    addr_sig    <= NUM - {flag_sig, counter_sig};
                 end
                 default: begin
                     state_reg <= I_QURTER;

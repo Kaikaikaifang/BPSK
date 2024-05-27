@@ -24,7 +24,6 @@ module serial2parallel #(
     output wire [WIDTH-1:0] parallel_sig
 );
     reg [WIDTH-1:0] parallel_r;
-    // wire [$clog2(WIDTH - 1) - 1:0] counter_sig;
 
     initial begin
         parallel_r = 0;

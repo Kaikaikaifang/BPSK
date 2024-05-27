@@ -27,8 +27,8 @@ module parallel2serial #(
     output wire [        0:0] serial_sig     // 串行信号
 );
 
-    reg  [            0:WIDTH - 1] parallel_r;
-    wire [$clog2(WIDTH - 1) - 1:0] counter_sig;
+    reg  [        0:WIDTH - 1] parallel_r;
+    wire [$clog2(WIDTH) - 1:0] counter_sig;
 
     // 1. 记数
     counter #(

@@ -9,11 +9,11 @@ module counter_tb;
     parameter NUM = 16;
 
     // counter Inputs
-    reg                       clk_sig = 0;
-    reg                       reset_sig = 0;
+    reg                    clk_sig = 0;
+    reg                    reset_sig = 0;
 
     // counter Outputs
-    wire [$clog2(NUM- 1)-1:0] counter_sig;
+    wire [$clog2(NUM)-1:0] counter_sig;
 
     /*iverilog */
     initial begin
@@ -36,7 +36,7 @@ module counter_tb;
         .clk_sig  (clk_sig),
         .reset_sig(reset_sig),
 
-        .counter_sig(counter_sig[$clog2(NUM-1)-1:0])
+        .counter_sig(counter_sig[$clog2(NUM)-1:0])
     );
 
     initial begin

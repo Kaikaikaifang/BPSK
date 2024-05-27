@@ -20,10 +20,10 @@
 module counter #(
     parameter NUM = 2048
 ) (
-    input                            clk_sig,
-    input                            reset_sig,    // 复位信号 低电平有效
-    output reg [$clog2(NUM - 1)-1:0] counter_sig,  // 计数器的值
-    output reg                       carry_sig     // 进位信号
+    input                        clk_sig,
+    input                        reset_sig,    // 复位信号 低电平有效
+    output reg [$clog2(NUM)-1:0] counter_sig,  // 计数器的值
+    output reg                   carry_sig     // 进位信号
 );
     initial begin
         counter_sig = 0;

@@ -25,7 +25,7 @@ module div #(
         div_sig = 0;
     end
 
-    wire [($clog2(NUM - 1) - 1):0] counter_sig;
+    wire [($clog2(NUM) - 1):0] counter_sig;
     counter #(
         .NUM(NUM)
     ) counter_inst (

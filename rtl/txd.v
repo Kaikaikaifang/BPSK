@@ -59,7 +59,9 @@ module txd (
     wire [0:0] m_sig;
     wire [0:0] barker_sig;
     // 2.1. 产生随机信源信号
-    mseries u_mseries (
+    mseries #(
+        .M(16)
+    ) u_mseries (
         .clk_sig(div_10_clk_sig),
         .rst_sig(rst_n),
 
@@ -69,7 +71,7 @@ module txd (
     Barker u_barker (
         .clk_sig   (div_5_clk_sig),
         .rst_n     (rst_n),
-        .en_p      (~sel_sig),       // TODO: 使能信号 由计数器驱动
+        .en_p      (en0_p[0]),
         .barker_sig(barker_sig)
     );
 
@@ -79,7 +81,7 @@ module txd (
     // 3.1 产生卷积码
     ConvEncode u_ConvEncode (
         .q_sig  (m_sig),
-        .en_p   (sel_sig),         // TODO: 使能信号 由计数器驱动
+        .en_p   (en1_p[0]),
         .clk_sig(div_10_clk_sig),
         .rst_n  (rst_n),
 
@@ -96,7 +98,7 @@ module txd (
     );
 
     // 4. 基带信号 BPSK 调制
-    wire [1:0] base_bpsk_sig;
+    wire [1:0] encode_bpsk_sig;
     wire [1:0] barker_bpsk_sig;
     // 4.1 巴克码 BPSK 调制
     bpsk u_bpsk (
@@ -112,7 +114,7 @@ module txd (
         .rst_n   (rst_n),
         .base_sig(encode_sig),
 
-        .bpsk_sig(base_bpsk_sig[1:0])
+        .bpsk_sig(encode_bpsk_sig[1:0])
     );
 
     // 5. 基带信号成型滤波
@@ -120,19 +122,24 @@ module txd (
     rrc_fir u_rrc_filter (
         .clk    (clk_sig),
         .rst_n  (rst_n),
-        .data_in(base_bpsk_sig),
+        .data_in(encode_bpsk_sig),
 
         .data_out(fir_sig)
     );
 
     // 6. 正交上变频
+    localparam WIDTH = 16;
+    localparam CNUM = 2;
     // 6.1 产生载波信号
-    wire [15:0] carrier_sig;
-    Carrier u_Carrier (
+    wire [WIDTH-1:0] carrier_sig;
+    Carrier #(
+        .WIDTH(WIDTH),
+        .NUM  (CNUM)
+    ) u_Carrier (
         .clk_sig(f_clk_sig),
         .rst_n  (rst_n),
 
-        .carrier_sig(carrier_sig[15:0])
+        .carrier_sig(carrier_sig[WIDTH-1:0])
     );
     // 6.2 上变频
     wire [15:0] barker_duc_sig;
@@ -140,20 +147,20 @@ module txd (
     // 6.2.1 巴克码上变频
     duc #(
         .BWIDTH(2),
-        .CWIDTH(16)
+        .CWIDTH(WIDTH)
     ) u_barker_duc (
         .base_sig   (barker_bpsk_sig[1:0]),
-        .carrier_sig(carrier_sig[15:0]),
+        .carrier_sig(carrier_sig[WIDTH-1:0]),
 
         .duc_sig(barker_duc_sig)
     );
     // 6.2.2 编码信号上变频
     duc #(
-        .BWIDTH(16),
-        .CWIDTH(16)
+        .BWIDTH(WIDTH),
+        .CWIDTH(WIDTH)
     ) u_encode_duc (
-        .base_sig   (fir_sig[15:0]),
-        .carrier_sig(carrier_sig[15:0]),
+        .base_sig   (fir_sig[WIDTH-1:0]),
+        .carrier_sig(carrier_sig[WIDTH-1:0]),
 
         .duc_sig(encode_duc_sig)
     );
@@ -169,15 +176,28 @@ module txd (
         .clk_sig  (div_5_clk_sig),
         .reset_sig(rst_n),
 
-        .counter_sig(counter_sig[$clog2(NUM-1)-1:0])
+        .counter_sig(counter_sig[$clog2(NUM)-1:0])
     );
     assign sel_sig = (counter_sig >= 0 && counter_sig < 7) ? 1'b0 : 1'b1;
     // 7.2 合路器
     mux u_mux (
-        .sel_sig(sel_sig),
+        .sel_sig(en1_p[1]),
         .in0_sig(barker_duc_sig),
         .in1_sig(encode_duc_sig),
 
         .out_sig(txd_sig)
     );
+
+    // 8. 产生使能信号
+    reg [1:0] en0_p;
+    reg [1:0] en1_p;
+    always @(posedge div_5_clk_sig) begin
+        if (!rst_n) begin
+            en0_p <= 2'b00;
+            en1_p <= 2'b00;
+        end else begin
+            en0_p <= {en0_p[0], ~sel_sig};
+            en1_p <= {en1_p[0], sel_sig};
+        end
+    end
 endmodule

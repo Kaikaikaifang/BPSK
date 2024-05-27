@@ -1,11 +1,11 @@
-`timescale 1ps / 1fs
+`timescale 1ns / 1ps
 `include "rtl/txd.v"
 
 module txd_tb;
 
     // txd Parameters
-    parameter FPERIOD = 78.125;  //时钟周期 78.125ps 12.8GHz
-    parameter PERIOD = 50000;  //时钟周期 20MHz
+    parameter FPERIOD = 2.5;  //时钟周期 2.5 ns 400 MHz
+    parameter PERIOD = 50;  //时钟周期 20 MHz
 
     // txd Inputs
     reg         f_clk_sig = 0;
@@ -43,7 +43,7 @@ module txd_tb;
     );
 
     initial begin
-        #50000000 $finish;
+        #142500 $finish;
     end
 
 endmodule
